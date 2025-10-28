@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/crud/img/favicon.ico">
+    <title>Login</title>
+    <style>
+        body {
+    margin: 5px;
+    padding: 5px;
+    border-radius: 0.5em;
+    border: 1px solid #000;
+    background-color: darkslategray;
+    color: #FFF;
+}
+
+img {
+    margin-right: 5px;
+    border-radius: 0.5em;
+}
+
+.box-shadow {
+    box-shadow: 0 0 0.6em #444444;
+}
+
+.box-shadow-hover{
+  -webkit-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+}
+
+.box-shadow-hover:hover  {
+    box-shadow: 0 0 1em #444444;
+}
+
+.modal-loader {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000082;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+
+.loader {
+    float: left;
+    width: 50px;
+    height: 50px;
+}
+
+.btn {
+    padding: 10px;
+    margin-top: 10px;
+    margin-right: 10px;
+    border: 0px;
+    border-radius: 0.5em;
+    background: linear-gradient(180deg, #43abff,#c2f5ff,#43abff);
+    box-shadow: 0 0 0.2em #444444;
+}
+
+input {
+    border-radius: 0.5em;
+    padding: 10px;
+    background-color: #f9f9f9;
+    box-shadow: inset 0 0 2px #4d4a4a;
+}
+
+.zoom {
+  -webkit-transition: all 0.1s  ease-out;
+  transition: all 0.1s ease-out;
+}
+
+.zoom:hover {
+  -ms-transform: scale(1.08);
+  -webkit-transform: scale(1.08);
+  transform: scale(1.08);
+}
+
+#moldura_conteudo {
+    height: 60%;
+    margin-top: 10px;
+    border: 1px solid #000;
+    border-radius: 0.5em;
+    padding: 10px;
+    background-color: #4d4a4a;
+    box-shadow: inset 0 0 2px #000;
+}
+
+#conteudo {
+    height: 100%;
+    border: 2px solid #000;
+    border-radius: 0.5em;
+    padding: 10px;
+    overflow: auto;
+    background-color: #8c8c8c;
+    box-shadow: inset 0 0 2px #000;
+}
+
+#logs {
+    height: 20%;
+    margin-top: 10px;
+    border: 1px solid #000;
+    border-radius: 0.5em;
+    padding: 10px;
+    color: #00bc19;
+    background: linear-gradient(180deg, black, black);
+    overflow: auto;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+label {
+    text-align: center;
+    cursor: pointer;
+    padding: 13px!important
+}
+
+.div-img {
+    display: inline-block;
+    text-align: center;
+}
+
+th {
+    text-align: center;
+}
+
+td {
+    max-width: 300px;
+    min-width: 250px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 2px; 
+  border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+  -webkit-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  background: linear-gradient(180deg, #43abff,#c2f5ff,#43abff);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  box-shadow: inset 0 0 0.5em #FFF, 0 0 10em #444444
+}
+
+@media screen and (max-width: 800px) {
+    th {
+        text-align: left;
+    }
+    td {
+        min-width: 250px;
+    }
+    input {
+        width: 100%;
+    }
+    .div-img {
+        width: 100%;
+    }
+    label {
+        display: block;
+    }
+    .btn {
+        margin-right: 0px;
+    }
+}
+    </style>
+</head>
+<body>
+    <div id="modal-loading" class="modal-loader">
+        <img src="/crud/img/loader.gif" class="loader" alt="loader" />
+    </div>
+    <div class="page">
+        <div class="formLogin">
+            <p style="text-align:center;"><img src="/crud/img/favicon.ico" style="height: 200px;width: 200px;border-radius: 10px;border: 2px solid #FFF;box-shadow: 0 0 5px 2px;"/></p>
+            <h1>Touch Yourself</h1>
+            <p>Digite os seus dados de acesso no campo abaixo.</p>
+            <label for="usuario">Usuário</label>
+            <input type="text" id="usuario" name="usuario" placeholder="Digite seu usuario" autofocus="true" />
+            <label for="password">Senha</label>
+            <input type="password" id="senha" name="senha" placeholder="Digite sua senha" />
+            <input type="button" value="Acessar" class="btn" onclick="login();"/>
+        </div>
+    </div>
+    <div id="logs" style="display:none;"></div>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>function login() {
+    objPessoa = {
+        user: document.getElementById("usuario").value,
+        pass: document.getElementById("senha").value,
+        type: 'LG',
+        action: 'UC'
+    }
+    execRecord(objPessoa, listRecords);
+}
+
+function atualizarUsuario() {
+    let senhaAtual = document.getElementById("senha").value;
+    let senhaConfirmacao = document.getElementById("senha2").value;
+    if (senhaAtual === senhaConfirmacao){
+        objPessoa = {
+            value: sessionStorage.getItem("value"),
+            new_user: document.getElementById("usuario").value,
+            new_pass: document.getElementById("senha").value,
+            new_name: document.getElementById("nome").value,
+            type: 'LG',
+            action: 'UU'
+        }
+        execRecord(objPessoa, listRecords);
+    } else {
+        alert("Senha e Confirmação de Senha estão diferentes. Verifique!");
+    }
+}
+
+
+function ajaxReq(valueData, functionAux) {
+    $.ajax({
+        url: '/crud/exec/',
+        data: valueData,
+        mimeType: 'ISO-8859-1',
+        type: 'post',
+        dataType: 'json',
+        processData: false,
+        cache: false,
+        contentType: false,
+        success: function (dataOut) {
+            if (functionAux) {
+                functionAux(dataOut);
+            }
+        },
+        beforeSend: function () {
+            $('.modal-loader').css({ display: "flex" });
+        },
+        complete: function () {
+            $('.modal-loader').css({ display: "none" });
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("erro: " + XMLHttpRequest.responseText + " | errorThrown(" + errorThrown + ")");
+        }
+    });
+}
+
+function execRecord(obj, functionAux) {
+    let fObj = new FormData();
+    for (let key in obj) {
+        fObj.append(key, obj[key]);
+    }
+    ajaxReq(fObj, functionAux);
+}
+
+function listRecords(data) {
+    if (data.msg) {
+        let msgAux = "";
+        let obj = data.msg;
+        for (let key in obj) {
+            msgAux += " - " + obj[key] + "<br/>";
+        }
+        //document.getElementById("logs").innerHTML = msgAux;
+    }
+    if (data.resultado) {
+        if ( data.resultado[0].value){
+            sessionStorage.setItem("value", data.resultado[0].value);
+        }
+        if (data.resultado[0].redirect) {
+            window.location.replace(data.resultado[0].redirect);
+        }
+    }
+}</script>
+</body>
+</html>
