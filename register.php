@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Meu Sistema CRUD</title>
+  <title>Registrar - Touch Your Butt-on</title>
+  <link rel="icon" type="image/png" href="https://i.imgur.com/l8NOfCE.png">
   <style>
-    /* Reset default styles */
     * {
       margin: 0;
       padding: 0;
@@ -13,7 +13,6 @@
       font-family: "Poppins", sans-serif;
     }
 
-    /* Background */
     body {
       background: #1A1A1D;
       height: 100vh;
@@ -22,19 +21,15 @@
       align-items: center;
     }
 
-    /* Container */
     .container {
       background: #0D0D0D;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      width: 380px;
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+      width: 400px;
       padding: 40px 35px;
       text-align: center;
     }
 
-   
-
-    /* Title and description */
     h1 {
       color: #FFF;
       font-size: 1.8em;
@@ -47,7 +42,6 @@
       margin-bottom: 25px;
     }
 
-    /* Labels */
     label {
       display: block;
       text-align: left;
@@ -57,7 +51,6 @@
       font-size: 0.9em;
     }
 
-    /* Inputs */
     input {
       width: 100%;
       padding: 12px 14px;
@@ -74,7 +67,6 @@
       box-shadow: 0 0 6px rgba(0, 71, 171, 0.3);
     }
 
-    /* Button */
     button {
       width: 100%;
       padding: 12px;
@@ -92,7 +84,6 @@
       background: #003b90;
     }
 
-    /* Footer text */
     .footer-text {
       margin-top: 25px;
       font-size: 0.85em;
@@ -112,22 +103,27 @@
 </head>
 <body>
   <div class="container">
-
-    <h1>Meu Sistema CRUD</h1>
-    <p class="subtitle">Digite os seus dados de acesso no campo abaixo.</p>
+    <h1>Crie sua conta</h1>
+    <p class="subtitle">Preencha os campos abaixo para se registrar.</p>
 
     <form>
+      <label for="nome">Nome completo</label>
+      <input type="text" id="nome" placeholder="Seu nome completo" required />
+
       <label for="usuario">Usuário</label>
-      <input type="text" id="usuario" placeholder="Nome de Usuario" required />
+      <input type="text" id="usuario" placeholder="Nome de usuário" required />
+
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="seuemail@exemplo.com" required />
 
       <label for="senha">Senha</label>
       <input type="password" id="senha" placeholder="Digite sua senha" required />
 
-      <button type="submit">Acessar</button>
+      <button type="submit">Registrar</button>
     </form>
 
     <p class="footer-text">
-      Não tem uma conta? <a href="#">Cadastre-se</a>
+      Já tem uma conta? <a href="login.php">Fazer login</a>
     </p>
   </div>
 </body>

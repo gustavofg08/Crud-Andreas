@@ -4,8 +4,170 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://i.imgur.com/l8NOfCE.png">
-    <link rel="stylesheet" href="css/style.css">
     <title>Touch my butt-on</title>
+    <style>
+      body {
+           background-color: #1A1A1D;
+           color: white;
+           text-align: center;
+       }
+
+       #logo {
+           width: 100px;
+           height: 100px;
+           animation: slide 0.5s linear;
+           margin: 20px auto;
+       }
+
+       #galo-cego {
+           width: 300px;
+           height: 300px;
+           margin: 20px auto;
+       }
+
+       .container-botões {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+        width: 40%;
+        margin: 40px auto;
+        padding-left: 35px;
+       }
+
+       .botões {
+           width: 100px;
+           padding: 10px;
+           background: linear-gradient(135deg, #3B1C32, #060673a4);
+           color: white;
+           border-radius: 15px;
+           transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+           backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border:1px solid rgba(255, 255, 255, 0.18);
+          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+          
+       }
+
+       .botões:hover {
+           transform: scale(1.1);
+           box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.6);
+           cursor: pointer;
+       }
+
+       @keyframes slide {
+           0% {
+               opacity: 0;
+           }
+
+           100% {
+               opacity: 1;
+           }
+       }
+
+       @media (max-width: 600px) {
+           #galo-cego {
+               width: 80%;
+               height: auto;
+           }
+
+           .container-botões {
+               width: 100%;
+           }
+
+           .botões {
+               width: 90%;
+           }
+       }
+     #rick-gif {
+    display: none; 
+    margin: 0 auto; 
+    position: absolute; 
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    z-index: 10;
+     }
+    h3 {
+        padding-top: 20px;
+    }
+.categories-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.categories-content {
+    background-color: lightgray;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 80%;
+    max-width: 400px;
+    font-size: 20px;
+    color: #000;
+}
+
+.categories-buttons button {
+    margin: 10px;
+    width: 100%;
+    
+}
+
+.close {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    float: right;
+}
+.botão-pesquisar {
+    width: 100px;
+           padding: 10px;
+           background: #2D2D2D;
+           color: white;
+           border-radius: 15px;
+           transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+           backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border:1px solid rgba(255, 255, 255, 0.18);
+          box-shadow: 0 8px 32px 0 #000;
+}
+.botão-pesquisar:hover {
+    transform: scale(1.1);
+           box-shadow: 0px 0px 8px #000;
+           cursor: pointer;
+}
+#openCategories, #openFavorites {
+    cursor: pointer;
+}
+#Outro:hover {
+    transform: scale(1.1);
+           box-shadow: 0px 0px 4px #000;
+           cursor: pointer;
+}
+#Jojo:hover {
+     transform: scale(1.1);
+           box-shadow: 0px 0px 4px #000;
+           cursor: pointer;
+}
+#Anime:hover {
+     transform: scale(1.1);
+           box-shadow: 0px 0px 4px #000;
+           cursor: pointer;
+}
+#Meme:hover {
+     transform: scale(1.1);
+           box-shadow: 0px 0px 4px #000;
+           cursor: pointer;
+}
+    </style>
     <style>
     .favorites-window {
         display: none;
@@ -193,7 +355,7 @@ header {
 <header>
     <a class="navbar-brand" href="#">
       <img src="https://i.imgur.com/l8NOfCE.png" alt="Logo">
-      Touch my butt-on
+      Touch Your Butt-on
     </a>
     <div class="hamburguer">
       <span class="bar"></span>
@@ -208,7 +370,7 @@ header {
         <li class="nav-item"><a href="https://api.whatsapp.com/send/?phone=92155305&amp;text&amp;type=phone_number&amp;app_absent=0">Contact</a></li>
         <li class="profile">
   <span id="logintext"><a href="login.php">Log-in</a></span>
-  <img src="https://i.imgur.com/bjreiM7.png" alt="Foto de Perfil" class="pfp">
+  <a href="#"><img src="#" alt="Foto de Perfil" class="pfp"></a>
 </li>
       </ul>
     </nav>
@@ -220,7 +382,7 @@ header {
     <img src="https://i.imgur.com/IX5RFf1.gif" alt="Galo Cego gif" id="galo-cego">
     <img id="rick-gif" src="https://i.imgur.com/AopnOfg.gif" alt="Rick Roll GIF" style="display: none; margin-top: 20px;">
     <div class="container-botões">
-       <button class="botões" onclick="playSound('sound1')">to be continued</button>
+        <button class="botões" onclick="playSound('sound1')">to be continued</button>
         <button class="botões"  onclick="playSound('sound2')">the office</button>
         <button class="botões"  onclick="playSound('sound3')">japones gritando</button>
         <button class="botões"  onclick="playSound('sound4')">bob esponja</button>
@@ -243,8 +405,7 @@ header {
         <button class="botões"  onclick="playSound('sound20')">???</button>
         <button class="botões"  onclick="playSound('sound21')">BURRO BURRO</button>
         <button class="botões"  onclick="playSound('sound22')">super xandão</button>
-        <button class="botões"  onclick="playSound('sound23')">esperan
-            do...
+        <button class="botões"  onclick="playSound('sound23')">esperando...
         </button>
         <button class="botões"  onclick="playSound('sound24')"><img src="https://i.imgur.com/gzwGUud.png" alt="gato suspeito" width="80px" height="80px"></button>
         <button class="botões"  onclick="playSound('sound25')">in nomine patris</button>
