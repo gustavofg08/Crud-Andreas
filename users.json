@@ -1,12 +1,14 @@
 [
-    {
-        "usuario": "admin",
-        "senha": "1234"
-    },
-    {
-        "usuario": "Gustavo",
-        "senha": "1234",
-        "email": "gustavofg60@gmail.com",
-        "logado": "sim"
-    }
+  {
+    "usuario": "admin",
+    "senha": "1234",
+    "foto": "https://i.imgur.com/Tl8ZBUZ.png",
+    "logado": "nao"
+  },
+  {
+    "usuario": "Gustavo",
+    "senha": "1234",
+    "foto": "https://i.imgur.com/i2TWK01.png",
+    "logado": "nao"
+  }
 ]

@@ -14,14 +14,20 @@
       font-family: "Poppins", sans-serif;
     }
 
-    /* Background */
     body {
-      background: #1A1A1D;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+  background: #1A1A1D;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.main-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 80px); /* espaço abaixo do header */
+}
+
 
     /* Container */
     .container {
@@ -31,6 +37,8 @@
       width: 380px;
       padding: 40px 35px;
       text-align: center;
+      position: relative;
+      z-index: 2; /* Ensure the form stays above the navbar on mobile */
     }
 
     /* Title and description */
@@ -107,11 +115,184 @@
     .footer-text a:hover {
       text-decoration: underline;
     }
+
+    header {
+      background-color: #0F0F0F;
+      padding: 20px 10%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1000;
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #edf0f1;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .navbar-brand img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .nav_links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-item a {
+      text-decoration: none;
+      color: #edf0f1;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .nav-item a:hover {
+      color: #0088a2;
+    }
+
+    .hamburguer {
+      display: none;
+      cursor: pointer;
+      position: absolute;
+      top: 20px;
+      right: 10%;
+      z-index: 1001;
+    }
+
+    .bar {
+      display: block;
+      width: 25px;
+      height: 3px;
+      margin: 5px;
+      background-color: #edf0f1;
+      transition: 0.3s;
+    }
+
+    @media (max-width: 768px) {
+      .hamburguer {
+        display: block;
+      }
+
+      .hamburguer.active .bar:nth-child(2) {
+        opacity: 0;
+      }
+
+      .hamburguer.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+      }
+
+      .hamburguer.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+      }
+
+      .nav_links {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background-color: #0F0F0F;
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        padding: 20px 0;
+      }
+
+      .nav_links.active {
+        left: 0;
+      }
+
+      .nav-item {
+        margin: 16px 0;
+      }
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #logintext {
+      color: #fff;
+      font-weight: 500;
+      padding: 6px 12px;
+      border: 2px solid #fff;
+      border-radius: 6px;
+      transition: 0.3s;
+    }
+
+    #logintext:hover {
+      transform: scale(1.08);
+      text-decoration: none;
+      transition: .2s;
+      box-shadow: 0px 0px 8px rgb(255, 255, 255);
+    }
+
+    .pfp {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 6px rgba(0, 136, 162, 0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .pfp:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.822);
+    }
+
+    nav {
+      z-index: 99999;
+    }
+
+    a {
+      text-decoration: none;
+      color: white;
+    }
+
+    header {
+      border-radius: 15px;
+      box-shadow: 0 0 12px rgb(255, 255, 255);
+    }
+
   </style>
 </head>
 <body>
+  <header>
+    <a class="navbar-brand" href="#">
+      <img src="https://i.imgur.com/l8NOfCE.png" alt="Logo">
+      Touch Your Butt-on
+    </a>
+    <div class="hamburguer">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+
+    <nav>
+      <ul class="nav_links">
+        <li class="nav-item"><a href="index.html">Home</a></li>
+        <li class="nav-item"><a href="about.html">About</a></li>
+        <li class="nav-item"><a href="https://api.whatsapp.com/send/?phone=92155305&amp;text&amp;type=phone_number&amp;app_absent=0">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="main-content">
   <div class="container">
-    <h1>Meu Sistema CRUD</h1>
+    <h1>Touch Your Butt-on</h1>
     <p class="subtitle">Digite os seus dados de acesso no campo abaixo.</p>
 
     <form id="loginForm">
@@ -128,10 +309,17 @@
       Não tem uma conta? <a href="register.php">Cadastre-se</a>
     </p>
   </div>
-
+</div>
   <script>
-    const form = document.getElementById('loginForm');
+    const hamburger = document.querySelector('.hamburguer');
+    const navLinks = document.querySelector('.nav_links');
 
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+
+    const form = document.getElementById('loginForm');
     form.addEventListener('submit', function(e) {
       e.preventDefault(); // previne o reload da página
 
@@ -147,7 +335,7 @@
       .then(data => {
         if (data.sucesso) {
           // redireciona para a página principal
-          window.location.href = 'index.php'; // substitua pelo caminho correto
+          window.location.href = 'index.html'; // substitua pelo caminho correto
         } else {
           alert(data.mensagem); // mostra erro se login inválido
         }
