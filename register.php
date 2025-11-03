@@ -55,74 +55,218 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Registrar - Touch Your Butt-on</title>
   <link rel="icon" type="image/png" href="https://i.imgur.com/l8NOfCE.png">
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family:"Poppins", sans-serif; }
-    body { background: #1A1A1D; color:#fff; display:flex; justify-content:center; align-items:center; flex-direction:column; min-height:100vh; }
+   /* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
 
-    /* NAVBAR */
-    header {
-      background-color: #0F0F0F;
-      padding: 20px 10%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      border-radius: 15px;
-      box-shadow: 0 0 12px rgb(255,255,255);
-      width: 90%;
-      max-width: 1200px;
-      margin-bottom: 20px;
+/* BODY */
+body {
+    background: #1A1A1D;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 120px; /* espaço para o header fixo */
+}
+
+/* NAVBAR */
+header {
+    background-color: #0F0F0F;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed; /* fixa no topo */
+    top: 0;
+    left: 50%; /* centraliza horizontalmente */
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 1200px;
+    border-radius: 15px;
+    box-shadow: 0 0 12px rgb(255, 255, 255);
+    z-index: 9999;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #edf0f1;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.navbar-brand img {
+    width: 40px;
+    height: 40px;
+}
+
+.nav_links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item a {
+    text-decoration: none;
+    color: #edf0f1;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.nav-item a:hover {
+    color: #0088a2;
+}
+
+/* PROFILE */
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#logintext {
+    color: #fff;
+    font-weight: 500;
+    padding: 6px 12px;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+#logintext:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 8px #fff;
+}
+
+.pfp {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 6px rgba(0, 136, 162, 0.4);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.pfp:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.822);
+}
+
+/* HAMBURGUER - RESPONSIVO */
+.hamburguer {
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    z-index: 1000;
+}
+
+.bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px;
+    background-color: #edf0f1;
+    transition: 0.3s;
+}
+
+@media (max-width: 768px) {
+    .hamburguer { display: block; }
+
+    .hamburguer.active .bar:nth-child(2) { opacity: 0; }
+    .hamburguer.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .hamburguer.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+    .nav_links {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background-color: #0F0F0F;
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        padding: 20px 0;
     }
 
-    .navbar-brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:#edf0f1; font-weight:bold; font-size:18px; }
-    .navbar-brand img { width:40px; height:40px; }
+    .nav_links.active { left: 0; }
+    .nav-item { margin: 16px 0; }
+}
 
-    .nav_links { list-style:none; display:flex; align-items:center; gap:20px; margin:0; padding:0; }
-    .nav-item a { text-decoration:none; color:#edf0f1; font-weight:500; transition:0.3s; }
-    .nav-item a:hover { color:#0088a2; }
+/* FORM CONTAINER */
+.container {
+    background: #0D0D0D;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+    width: 400px;
+    padding: 40px 35px;
+    text-align: center;
+}
 
-    .hamburguer { display:none; cursor:pointer; position:absolute; top:25px; right:10%; z-index:1000; }
-    .bar { display:block; width:25px; height:3px; margin:5px; background-color:#edf0f1; transition:0.3s; }
+/* FORM ELEMENTS */
+h1 { color: #FFF; font-size: 1.8em; margin-bottom: 10px; }
+p.subtitle { color: #FFF; font-size: 0.9em; margin-bottom: 25px; }
+label { display: block; text-align: left; font-weight: 600; color: #FFF; margin-bottom: 6px; font-size: 0.9em; }
 
-    @media (max-width: 768px) {
-      .hamburguer { display:block; }
-      .hamburguer.active .bar:nth-child(2) { opacity:0; }
-      .hamburguer.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-      .hamburguer.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #cfd6dd;
+    margin-bottom: 18px;
+    font-size: 0.95em;
+    outline: none;
+    transition: 0.3s;
+}
 
-      .nav_links { position:fixed; left:-100%; top:70px; flex-direction:column; background-color:#0F0F0F; width:100%; text-align:center; transition:0.3s; padding:20px 0; }
-      .nav_links.active { left:0; }
-      .nav-item { margin:16px 0; }
-    }
+input:focus {
+    border-color: #0047ab;
+    box-shadow: 0 0 6px rgba(0, 71, 171, 0.3);
+}
 
-    .profile { display:flex; align-items:center; gap:10px; }
-    #logintext { color:#fff; font-weight:500; padding:6px 12px; border:2px solid #fff; border-radius:6px; transition:0.3s; }
-    #logintext:hover { transform: scale(1.08); box-shadow:0 0 8px #fff; }
+button {
+    width: 100%;
+    padding: 12px;
+    background: #0047ab;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-    .pfp { width:45px; height:45px; border-radius:50%; object-fit:cover; box-shadow:0 0 6px rgba(0,136,162,0.4); cursor:pointer; transition:0.3s; }
-    .pfp:hover { transform:scale(1.05); box-shadow:0 0 12px rgba(255,255,255,0.822); }
+button:hover { background: #003b90; }
 
-    /* FORM */
-    .container {
-      background: #0D0D0D;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(255,255,255,0.1);
-      width: 400px;
-      padding: 40px 35px;
-      text-align: center;
-    }
+/* FOOTER TEXT */
+.footer-text {
+    margin-top: 25px;
+    font-size: 0.85em;
+    color: #6c757d;
+}
 
-    h1 { color:#FFF; font-size:1.8em; margin-bottom:10px; }
-    p.subtitle { color:#FFF; font-size:0.9em; margin-bottom:25px; }
-    label { display:block; text-align:left; font-weight:600; color:#FFF; margin-bottom:6px; font-size:0.9em; }
-    input { width:100%; padding:12px 14px; border-radius:8px; border:1px solid #cfd6dd; margin-bottom:18px; font-size:0.95em; outline:none; transition:0.3s; }
-    input:focus { border-color:#0047ab; box-shadow:0 0 6px rgba(0,71,171,0.3); }
+.footer-text a {
+    color: #0047ab;
+    text-decoration: none;
+    font-weight: 600;
+}
 
-    button { width:100%; padding:12px; background:#0047ab; color:#fff; border:none; border-radius:8px; font-size:1em; font-weight:600; cursor:pointer; transition:0.3s; }
-    button:hover { background:#003b90; }
+.footer-text a:hover { text-decoration: underline; }
 
-    .footer-text { margin-top:25px; font-size:0.85em; color:#6c757d; }
-    .footer-text a { color:#0047ab; text-decoration:none; font-weight:600; }
-    .footer-text a:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -141,10 +285,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <li class="nav-item"><a href="index.html">Home</a></li>
         <li class="nav-item"><a href="about.html">About</a></li>
         <li class="nav-item"><a href="https://api.whatsapp.com/send/?phone=92155305&text&type=phone_number&app_absent=0">Contact</a></li>
-        <li class="profile">
-          <span id="logintext"><a href="login.php">Log-in</a></span>
-          <a href="#"><img src="#" alt="Foto de Perfil" class="pfp"></a>
-        </li>
       </ul>
     </nav>
 </header>
