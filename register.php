@@ -1,4 +1,8 @@
 <?php
+session_start();
+// assume you set $_SESSION['usuario_id'], $_SESSION['usuario_nome'] (and later $_SESSION['usuario_foto'])
+?>
+<?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 header('Content-Type: text/html; charset=utf-8');
@@ -68,12 +72,13 @@ body {
     background: #1A1A1D;
     color: #fff;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    justify-content: flex-start;
+    align-items: center;
     flex-direction: column;
     min-height: 100vh;
-    padding-top: 120px; /* espaço para o header fixo */
+    padding-top: 120px;
 }
+
 
 /* NAVBAR */
 header {
@@ -282,7 +287,7 @@ button:hover { background: #003b90; }
     </div>
     <nav>
       <ul class="nav_links">
-        <li class="nav-item"><a href="index.html">Home</a></li>
+        <li class="nav-item"><a href="index.php">Home</a></li>
         <li class="nav-item"><a href="about.html">About</a></li>
         <li class="nav-item"><a href="https://api.whatsapp.com/send/?phone=92155305&text&type=phone_number&app_absent=0">Contact</a></li>
       </ul>

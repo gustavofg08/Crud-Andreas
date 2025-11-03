@@ -1,0 +1,499 @@
+<?php
+session_start();
+$loggedIn = isset($_SESSION['usuario_id']);
+$fotoPerfil = $loggedIn ? ($_SESSION['usuario_foto'] ?? 'default‑avatar.png') : null;
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/l8NOfCE.png">
+    <title>Touch my butt-on</title>
+    <style>
+      body {
+           background-color: #1A1A1D;
+           color: white;
+           text-align: center;
+       }
+
+       #logo {
+           width: 100px;
+           height: 100px;
+           animation: slide 0.5s linear;
+           margin: 20px auto;
+       }
+
+       #galo-cego {
+           width: 300px;
+           height: 300px;
+           margin: 20px auto;
+       }
+
+       .container-botões {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+        width: 40%;
+        margin: 40px auto;
+        padding-left: 35px;
+       }
+
+       .botões {
+           width: 100px;
+           padding: 10px;
+           background: linear-gradient(135deg, #3B1C32, #060673a4);
+           color: white;
+           border-radius: 15px;
+           transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+           backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border:1px solid rgba(255, 255, 255, 0.18);
+          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+          
+       }
+
+       .botões:hover {
+           transform: scale(1.1);
+           box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.6);
+           cursor: pointer;
+       }
+
+       @keyframes slide {
+           0% {
+               opacity: 0;
+           }
+
+           100% {
+               opacity: 1;
+           }
+       }
+
+       @media (max-width: 600px) {
+           #galo-cego {
+               width: 80%;
+               height: auto;
+           }
+
+           .container-botões {
+               width: 100%;
+           }
+
+           .botões {
+               width: 90%;
+           }
+       }
+     #rick-gif {
+    display: none; 
+    margin: 0 auto; 
+    position: absolute; 
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    z-index: 10;
+     }
+    h3 {
+        padding-top: 20px;
+    }
+.categories-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.categories-content {
+    background-color: lightgray;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 80%;
+    max-width: 400px;
+    font-size: 20px;
+    color: #000;
+}
+
+.categories-buttons button {
+    margin: 10px;
+    width: 100%;
+    
+}
+
+.close {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    float: right;
+}
+.botão-pesquisar {
+    width: 100px;
+           padding: 10px;
+           background: #2D2D2D;
+           color: white;
+           border-radius: 15px;
+           transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+           backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border:1px solid rgba(255, 255, 255, 0.18);
+          box-shadow: 0 8px 32px 0 #000;
+}
+.botão-pesquisar:hover {
+    transform: scale(1.1);
+           box-shadow: 0px 0px 8px #000;
+           cursor: pointer;
+}
+#openCategories, #openFavorites {
+    cursor: pointer;
+}
+#Outro:hover {
+    transform: scale(1.1);
+           box-shadow: 0px 0px 4px #000;
+           cursor: pointer;
+}
+#Jojo:hover {
+     transform: scale(1.1);
+           box-shadow: 0px 0px 4px #000;
+           cursor: pointer;
+}
+#Anime:hover {
+     transform: scale(1.1);
+           box-shadow: 0px 0px 4px #000;
+           cursor: pointer;
+}
+#Meme:hover {
+     transform: scale(1.1);
+           box-shadow: 0px 0px 4px #000;
+           cursor: pointer;
+}
+    </style>
+    <style>
+    .favorites-window {
+        display: none;
+        position: fixed;
+        top: 50px;
+        right: 20px;
+        width: 300px;
+        background: darkslategray;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1050;
+        
+    }
+
+    .favorites-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: #343a40;
+        color: #fff;
+        border-bottom: 1px solid #ccc;
+        
+    }
+
+    .favorites-content {
+        padding: 10px;
+    }
+     #openFavorites {
+        outline: none;
+        border: none;
+    }
+
+    #openFavorites:focus {
+        outline: none;
+        box-shadow: none;
+    }
+  /* =========================
+   NAVBAR FIXA E RESPONSIVA
+========================= */
+
+/* HEADER */
+header {
+    background-color: #0F0F0F;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed; /* fixa no topo */
+    top: 0;
+    left: 50%; /* centraliza horizontalmente */
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 1200px;
+    border-radius: 15px;
+    box-shadow: 0 0 12px rgb(255, 255, 255);
+    z-index: 9999;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #edf0f1;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.navbar-brand img {
+    width: 40px;
+    height: 40px;
+}
+
+.nav_links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item a {
+    text-decoration: none;
+    color: #edf0f1;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.nav-item a:hover {
+    color: #0088a2;
+}
+
+/* PROFILE */
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#logintext {
+    color: #fff;
+    font-weight: 500;
+    padding: 6px 12px;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+#logintext:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 8px #fff;
+}
+
+.pfp {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 6px rgba(0, 136, 162, 0.4);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.pfp:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.822);
+}
+
+/* HAMBURGUER - RESPONSIVO */
+.hamburguer {
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    z-index: 1000;
+}
+
+.bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px;
+    background-color: #edf0f1;
+    transition: 0.3s;
+}
+
+@media (max-width: 768px) {
+    .hamburguer { display: block; }
+
+    .hamburguer.active .bar:nth-child(2) { opacity: 0; }
+    .hamburguer.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .hamburguer.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+    .nav_links {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background-color: #0F0F0F;
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        padding: 20px 0;
+    }
+
+    .nav_links.active { left: 0; }
+    .nav-item { margin: 16px 0; }
+}
+
+a {
+  text-decoration: none;
+  color: white;
+}
+header {
+  border-radius: 15px;
+  box-shadow: 0 0 12px rgb(255, 255, 255);
+}
+</style>
+</head>
+<body>
+<header>
+    <a class="navbar-brand" href="#">
+      <img src="https://i.imgur.com/l8NOfCE.png" alt="Logo">
+      Touch Your Butt-on
+    </a>
+    <div class="hamburguer">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+
+    <nav>
+      <ul class="nav_links">
+        <li class="nav-item"><a href="index.php">Home</a></li>
+        <li class="nav-item"><a href="about.html">About</a></li>
+        <li class="nav-item"><a href="https://api.whatsapp.com/send/?phone=92155305&amp;text&amp;type=phone_number&amp;app_absent=0">Contact</a></li>
+          <li class="profile">
+      <?php if ($loggedIn): ?>
+        <a href="perfil.php">
+          <img src="uploads/<?= htmlspecialchars($fotoPerfil) ?>" alt="Foto de Perfil" class="pfp">
+          <span id="logintext">Seu Perfil</span>
+        </a>
+      <?php else: ?>
+        <span id="logintext"><a href="login.php">Log‑in</a></span>
+      <?php endif; ?>
+    </li>
+      </ul>
+    </nav>
+  </header>
+
+</div>
+    <img id="rick-gif" src="https://i.imgur.com/AopnOfg.gif" alt="Rick Roll GIF" style="display: none; margin-top: 20px;">
+    <div class="container-botões">
+        <button class="botões" onclick="playSound('sound1')">to be continued</button>
+        <button class="botões"  onclick="playSound('sound2')">the office</button>
+        <button class="botões"  onclick="playSound('sound3')">japones gritando</button>
+        <button class="botões"  onclick="playSound('sound4')">bob esponja</button>
+        <button class="botões"  onclick="playSound('sound5')">gay</button>
+        <button class="botões"  onclick="playSound('sound6')">nigerun
+            dayo </button>
+        <button class="botões"  onclick="playSound('sound7')">this is elon musk</button>
+        <button class="botões"  onclick="playSound('sound8')"><img src="https://i.imgur.com/O5uHcE9.png" alt="gato chines" width="30px" height="30px"></button>
+        <button class="botões"  onclick="playSound('sound9', true)">surpresa</button>
+        <button class="botões"  onclick="playSound('sound10')">windows xp</button>
+        <button class="botões"  onclick="playSound('sound11')">bluetooth</button>
+        <button class="botões"  onclick="playSound('sound12')">wide Putin</button>
+        <button class="botões"  onclick="playSound('sound13')">wtf is a kilometer</button>
+        <button class="botões"  onclick="playSound('sound14')">Sax</button>
+        <button class="botões"  onclick="playSound('sound15')">HUH</button>
+        <button class="botões"  onclick="playSound('sound16')">io fone linging</button>
+        <button class="botões"  onclick="playSound('sound17')">6:30</button>
+        <button class="botões"  onclick="playSound('sound18')">oh my god</button>
+        <button class="botões"  onclick="playSound('sound19')">FBI</button>
+        <button class="botões"  onclick="playSound('sound20')">???</button>
+        <button class="botões"  onclick="playSound('sound21')">BURRO BURRO</button>
+        <button class="botões"  onclick="playSound('sound22')">super xandão</button>
+        <button class="botões"  onclick="playSound('sound23')">esperando...
+        </button>
+        <button class="botões"  onclick="playSound('sound24')"><img src="https://i.imgur.com/gzwGUud.png" alt="gato suspeito" width="80px" height="80px"></button>
+        <button class="botões"  onclick="playSound('sound25')">in nomine patris</button>
+        <button class="botões"  onclick="playSound('sound26')">grito</button>
+        <button class="botões"  onclick="playSound('sound27')">pewpew?</button>
+        <button class="botões"  onclick="playSound('sound28')">miranha</button>
+        <button class="botões"  onclick="playSound('sound29')">a few moments later</button>
+        <button class="botões"  onclick="playSound('sound30')">FIM</button>
+        <audio id="sound1" src="audio/jojoending.mp3"></audio>
+        <audio id="sound2" src="audio/The-Office-US-Intro.mp3"></audio>
+        <audio id="sound3" src="audio/japonego.mp3"></audio>
+        <audio id="sound4" src="audio/bob esponja.mp3"></audio>
+        <audio id="sound5" src="audio/gay-echo.mp3"></audio>
+        <audio id="sound6" src="audio/N I G E R U N D A Y O.mp3"></audio>
+        <audio id="sound7" src="audio/elon-musk-1.mp3"></audio>
+        <audio id="sound8" src="audio/chinese-dream.mp3"></audio>
+        <audio id="sound9" src="audio/rick roll.mp3"></audio>
+        <audio id="sound10" src="audio/windowsxp.mp3"></audio>
+        <audio id="sound11" src="audio/the-bluetooth-device-is-ready-to-pair.mp3"></audio>
+        <audio id="sound12" src="audio/wide-putin-walking-but-hes-always-in-frame-full-version-mp3cut.mp3"></audio>
+        <audio id="sound13" src="audio/wtf-is-a-kilometer.mp3"></audio>
+        <audio id="sound14" src="audio/sexy sax.mp3"></audio>
+        <audio id="sound15" src="audio/huh.mp3"></audio>
+        <audio id="sound16" src="audio/your-phone-ringing_TKtb5bz.mp3"></audio>
+        <audio id="sound17" src="audio/samsung.mp3"></audio>
+        <audio id="sound18" src="audio/omgwow.mp3"></audio>
+        <audio id="sound19" src="audio/FBI.mp3"></audio>
+        <audio id="sound20" src="audio/Instagram thud Sound Effect HD.mp3"></audio>
+        <audio id="sound21" src="audio/Psicologicamente destruído moralmente abalado e tecnicamente.mp3"></audio>
+        <audio id="sound22" src="audio/xandao-pichau.mp3"></audio>
+        <audio id="sound23" src="audio/musica-elevador-short.mp3"></audio>
+        <audio id="sound24" src="audio/among-us-role-reveal-sound.mp3"></audio>
+        <audio id="sound25" src="audio/In Nomine Patris Et Filli Et Spiritus Sancti Sound Effect.mp3"></audio>
+        <audio id="sound26" src="audio/wilhelmscream.mp3"></audio>
+        <audio id="sound27" src="audio/pew_pew-dknight556-1379997159.mp3"></audio>
+        <audio id="sound28" src="audio/spiderman-meme-song.mp3"></audio>
+        <audio id="sound29" src="audio/a-few-moments-later-hd.mp3"></audio>
+        <audio id="sound30" src="audio/outro-song_oqu8zAg.mp3"></audio>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function playSound(soundId, showGif = false) {
+            var audio = document.getElementById(soundId);
+            audio.currentTime = 0; 
+            audio.play(); 
+
+            if (showGif) {
+                var rickGif = document.getElementById('rick-gif');
+                rickGif.style.display = 'block'; 
+                setTimeout(() => {
+                    rickGif.style.display = 'none';
+                }, 7000);
+            }
+        }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const hamburguer = document.querySelector('.hamburguer');
+    const navLinks = document.querySelector('.nav_links');
+
+    hamburguer.addEventListener('click', () => {
+      hamburguer.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+
+    document.querySelectorAll('.li_nav').forEach(n =>
+      n.addEventListener('click', () => {
+        hamburguer.classList.remove('active');
+        navLinks.classList.remove('active');
+      })
+    );
+  </script>
+  <script>
+    const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+if (!usuarioLogado) {
+  // not logged in → redirect to login page
+  window.location.href = 'login.php';
+}
+
+  </script>
+</body>
+</html>
+
