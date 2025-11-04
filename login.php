@@ -1,3 +1,38 @@
+<?php
+session_start();
+
+// Lê o JSON com os usuários cadastrados
+$usuarios = json_decode(file_get_contents('users.json'), true);
+
+// Lê o corpo da requisição (via formulário ou JSON)
+$dados = $_POST;
+// Caso esteja usando fetch com JSON:
+// $dados = json_decode(file_get_contents('php://input'), true);
+
+$usuario = $dados['usuario'] ?? '';
+$senha = $dados['senha'] ?? '';
+
+$logado = false;
+
+// Verifica se o usuário existe no JSON
+foreach ($usuarios as $u) {
+    if ($u['usuario'] === $usuario && $u['senha'] === $senha) {
+        $logado = true;
+        break;
+    }
+}
+
+if ($logado) {
+    $_SESSION['logado'] = true;
+    $_SESSION['usuario'] = $usuario;
+    header('Location: home.php');
+    exit;
+} else {
+    $_SESSION['logado'] = false;
+    echo "Usuário ou senha incorretos!";
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,7 +41,6 @@
   <title>Login - Touch Your Butt-on</title>
   <link rel="icon" type="image/png" href="https://i.imgur.com/l8NOfCE.png">
   <style>
-    /* Reset default styles */
     * {
       margin: 0;
       padding: 0;
@@ -15,21 +49,19 @@
     }
 
     body {
-  background: #1A1A1D;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-}
+      background: #1A1A1D;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
 
-.main-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(100vh - 80px); /* espaço abaixo do header */
-}
+    .main-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 80px);
+    }
 
-
-    /* Container */
     .container {
       background: #0D0D0D;
       border-radius: 16px;
@@ -38,10 +70,9 @@
       padding: 40px 35px;
       text-align: center;
       position: relative;
-      z-index: 2; /* Ensure the form stays above the navbar on mobile */
+      z-index: 2;
     }
 
-    /* Title and description */
     h1 {
       color: #FFF;
       font-size: 1.8em;
@@ -54,7 +85,6 @@
       margin-bottom: 25px;
     }
 
-    /* Labels */
     label {
       display: block;
       text-align: left;
@@ -64,7 +94,6 @@
       font-size: 0.9em;
     }
 
-    /* Inputs */
     input {
       width: 100%;
       padding: 12px 14px;
@@ -81,7 +110,6 @@
       box-shadow: 0 0 6px rgba(0, 71, 171, 0.3);
     }
 
-    /* Button */
     button {
       width: 100%;
       padding: 12px;
@@ -99,7 +127,6 @@
       background: #003b90;
     }
 
-    /* Footer text */
     .footer-text {
       margin-top: 25px;
       font-size: 0.85em;
@@ -117,120 +144,81 @@
     }
 
     header {
-    background-color: #0F0F0F;
-    padding: 20px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: fixed; /* fixa no topo */
-    top: 0;
-    left: 50%; /* centraliza horizontalmente */
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 1200px;
-    border-radius: 15px;
-    box-shadow: 0 0 12px rgb(255, 255, 255);
-    z-index: 9999;
-}
+      background-color: #0F0F0F;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 1200px;
+      border-radius: 15px;
+      box-shadow: 0 0 12px rgb(255, 255, 255);
+      z-index: 9999;
+    }
 
-.navbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    color: #edf0f1;
-    font-weight: bold;
-    font-size: 18px;
-}
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #edf0f1;
+      font-weight: bold;
+      font-size: 18px;
+    }
 
-.navbar-brand img {
-    width: 40px;
-    height: 40px;
-}
-
-.nav_links {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin: 0;
-    padding: 0;
-}
-
-.nav-item a {
-    text-decoration: none;
-    color: #edf0f1;
-    font-weight: 500;
-    transition: 0.3s;
-}
-
-.nav-item a:hover {
-    color: #0088a2;
-}
-
-/* PROFILE */
-.profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#logintext {
-    color: #fff;
-    font-weight: 500;
-    padding: 6px 12px;
-    border: 2px solid #fff;
-    border-radius: 6px;
-    transition: 0.3s;
-}
-
-#logintext:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 8px #fff;
-}
-
-.pfp {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 0 6px rgba(0, 136, 162, 0.4);
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.pfp:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.822);
-}
-
-/* HAMBURGUER - RESPONSIVO */
-.hamburguer {
-    display: none;
-    cursor: pointer;
-    position: absolute;
-    top: 25px;
-    right: 40px;
-    z-index: 1000;
-}
-
-.bar {
-    display: block;
-    width: 25px;
-    height: 3px;
-    margin: 5px;
-    background-color: #edf0f1;
-    transition: 0.3s;
-}
-
-@media (max-width: 768px) {
-    .hamburguer { display: block; }
-
-    .hamburguer.active .bar:nth-child(2) { opacity: 0; }
-    .hamburguer.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-    .hamburguer.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    .navbar-brand img {
+      width: 40px;
+      height: 40px;
+    }
 
     .nav_links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-item a {
+      text-decoration: none;
+      color: #edf0f1;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .nav-item a:hover {
+      color: #0088a2;
+    }
+
+    .hamburguer {
+      display: none;
+      cursor: pointer;
+      position: absolute;
+      top: 25px;
+      right: 40px;
+      z-index: 1000;
+    }
+
+    .bar {
+      display: block;
+      width: 25px;
+      height: 3px;
+      margin: 5px;
+      background-color: #edf0f1;
+      transition: 0.3s;
+    }
+
+    @media (max-width: 768px) {
+      .hamburguer { display: block; }
+      .hamburguer.active .bar:nth-child(2) { opacity: 0; }
+      .hamburguer.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+      .hamburguer.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+      .nav_links {
         position: fixed;
         left: -100%;
         top: 70px;
@@ -240,38 +228,25 @@
         text-align: center;
         transition: 0.3s;
         padding: 20px 0;
+      }
+      .nav_links.active { left: 0; }
+      .nav-item { margin: 16px 0; }
     }
-
-    .nav_links.active { left: 0; }
-    .nav-item { margin: 16px 0; }
-}
 
     a {
       text-decoration: none;
       color: white;
     }
-
-    header {
-      border-radius: 15px;
-      box-shadow: 0 0 12px rgb(255, 255, 255);
-    }
-
   </style>
 </head>
-<body>
-  <?php
-session_start();
-$loggedIn = isset($_SESSION['usuario_id']);
-$fotoPerfil = $loggedIn
-    ? ($_SESSION['usuario_foto'] ?? 'default‑avatar.png')
-    : null;
-?>
 
+<body>
   <header>
     <a class="navbar-brand" href="#">
       <img src="https://i.imgur.com/l8NOfCE.png" alt="Logo">
       Touch Your Butt-on
     </a>
+
     <div class="hamburguer">
       <span class="bar"></span>
       <span class="bar"></span>
@@ -282,30 +257,32 @@ $fotoPerfil = $loggedIn
       <ul class="nav_links">
         <li class="nav-item"><a href="index.php">Home</a></li>
         <li class="nav-item"><a href="about.html">About</a></li>
-        <li class="nav-item"><a href="https://api.whatsapp.com/send/?phone=92155305&amp;text&amp;type=phone_number&amp;app_absent=0">Contact</a></li>
+        <li class="nav-item"><a href="https://api.whatsapp.com/send/?phone=92155305">Contact</a></li>
       </ul>
     </nav>
   </header>
+
   <div class="main-content">
-  <div class="container">
-    <h1>Touch Your Butt-on</h1>
-    <p class="subtitle">Digite os seus dados de acesso no campo abaixo.</p>
+    <div class="container">
+      <h1>Touch Your Butt-on</h1>
+      <p class="subtitle">Digite os seus dados de acesso no campo abaixo.</p>
 
-    <form id="loginForm">
-      <label for="usuario">Usuário</label>
-      <input type="text" id="usuario" placeholder="Nome de Usuario" required />
+      <form id="loginForm">
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" placeholder="Nome de Usuário" required />
 
-      <label for="senha">Senha</label>
-      <input type="password" id="senha" placeholder="Digite sua senha" required />
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" placeholder="Digite sua senha" required />
 
-      <button type="submit">Acessar</button>
-    </form>
+        <button type="submit">Acessar</button>
+      </form>
 
-    <p class="footer-text">
-      Não tem uma conta? <a href="register.php">Cadastre-se</a>
-    </p>
+      <p class="footer-text">
+        Não tem uma conta? <a href="register.php">Cadastre-se</a>
+      </p>
+    </div>
   </div>
-</div>
+
   <script>
     const hamburger = document.querySelector('.hamburguer');
     const navLinks = document.querySelector('.nav_links');
@@ -317,8 +294,7 @@ $fotoPerfil = $loggedIn
 
     const form = document.getElementById('loginForm');
     form.addEventListener('submit', function(e) {
-      e.preventDefault(); // previne o reload da página
-
+      e.preventDefault();
       const usuario = document.getElementById('usuario').value;
       const senha = document.getElementById('senha').value;
 
@@ -330,10 +306,9 @@ $fotoPerfil = $loggedIn
       .then(res => res.json())
       .then(data => {
         if (data.sucesso) {
-          // redireciona para a página principal
-          window.location.href = 'index.php'; // substitua pelo caminho correto
+          window.location.href = 'index.php';
         } else {
-          alert(data.mensagem); // mostra erro se login inválido
+          alert(data.mensagem);
         }
       })
       .catch(err => console.error(err));

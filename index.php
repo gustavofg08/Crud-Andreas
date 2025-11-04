@@ -1,7 +1,13 @@
 <?php
 session_start();
-$loggedIn = isset($_SESSION['usuario_id']);
-$fotoPerfil = $loggedIn ? ($_SESSION['usuario_foto'] ?? 'default‑avatar.png') : null;
+
+// Se não estiver logado, redireciona de volta pro login
+if (!isset($_SESSION['logado']) || $_SESSION['logado'] === false) {
+    header('Location: login.html');
+    exit;
+}
+
+echo "Bem-vindo, " . htmlspecialchars($_SESSION['usuario']) . "!";
 ?>
 
 <!DOCTYPE html>
@@ -221,19 +227,45 @@ header {
     background-color: #0F0F0F;
     padding: 20px 40px;
     display: flex;
+<<<<<<< HEAD
+<<<<<<<< HEAD:index.php
+=======
+>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
     align-items: center;
     justify-content: space-between;
     position: fixed; /* fixa no topo */
     top: 0;
     left: 50%; /* centraliza horizontalmente */
+<<<<<<< HEAD
+========
+    justify-content: space-between; /* logo à esquerda, links à direita */
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 50%;
+>>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411:index.html
+=======
+>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
     transform: translateX(-50%);
     width: 90%;
     max-width: 1200px;
     border-radius: 15px;
+<<<<<<< HEAD
+<<<<<<<< HEAD:index.php
+    box-shadow: 0 0 12px rgb(255, 255, 255);
+========
+    box-shadow: 0 0 12px rgba(255,255,255,0.2);
+>>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411:index.html
+    z-index: 9999;
+}
+
+/* LOGO */
+=======
     box-shadow: 0 0 12px rgb(255, 255, 255);
     z-index: 9999;
 }
 
+>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
 .navbar-brand {
     display: flex;
     align-items: center;
@@ -249,6 +281,10 @@ header {
     height: 40px;
 }
 
+<<<<<<< HEAD
+/* LINKS */
+=======
+>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
 .nav_links {
     list-style: none;
     display: flex;
@@ -295,13 +331,25 @@ header {
     height: 45px;
     border-radius: 50%;
     object-fit: cover;
+<<<<<<< HEAD
+<<<<<<<< HEAD:index.php
     box-shadow: 0 0 6px rgba(0, 136, 162, 0.4);
+========
+    box-shadow: 0 0 6px rgba(0,136,162,0.4);
+>>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411:index.html
+=======
+    box-shadow: 0 0 6px rgba(0, 136, 162, 0.4);
+>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
     cursor: pointer;
     transition: 0.3s;
 }
 
 .pfp:hover {
     transform: scale(1.05);
+<<<<<<< HEAD
+<<<<<<<< HEAD:index.php
+=======
+>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.822);
 }
 
@@ -312,6 +360,19 @@ header {
     position: absolute;
     top: 25px;
     right: 40px;
+<<<<<<< HEAD
+========
+    box-shadow: 0 0 12px rgba(255,255,255,0.822);
+}
+
+/* HAMBURGUER */
+.hamburguer {
+    display: none;
+    cursor: pointer;
+    position: relative;
+>>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411:index.html
+=======
+>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
     z-index: 1000;
 }
 
@@ -324,6 +385,13 @@ header {
     transition: 0.3s;
 }
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:index.php
+========
+/* RESPONSIVO */
+>>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411:index.html
+=======
+>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
 @media (max-width: 768px) {
     .hamburguer { display: block; }
 
@@ -344,6 +412,13 @@ header {
     }
 
     .nav_links.active { left: 0; }
+<<<<<<< HEAD
+<<<<<<<< HEAD:index.php
+========
+
+>>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411:index.html
+=======
+>>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
     .nav-item { margin: 16px 0; }
 }
 
