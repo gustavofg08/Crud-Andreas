@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 session_start();
 if (!isset($_SESSION['usuario_id'])) {
@@ -300,5 +299,5 @@ if (!isset($_SESSION['usuario_id'])) {
 <body>
     
 </body>
->>>>>>> e6ccc33e35b8ae902cdbae75d8f0dba6db4cc411
+
 </html>
