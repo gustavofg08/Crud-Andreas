@@ -1,303 +1,193 @@
 <?php
 session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    // Not logged in → redirect to login page
-    header('Location: login.php');
-    exit;
+require_once 'db.php';
+
+// ===============================
+// VERIFICA LOGIN / AUTO LOGIN
+// ===============================
+$logado    = isset($_SESSION['logado']) && $_SESSION['logado'] === true;
+$usuario   = $logado ? $_SESSION['usuario'] : null;
+$idUsuario = $logado ? $_SESSION['idUsuario'] : null;
+
+$fotoPerfil = null;
+
+if ($logado && $idUsuario) {
+    $stmt = $conn->prepare("SELECT fotoPerfil FROM uploads WHERE idUsuario = ? ORDER BY dataUpload DESC LIMIT 1");
+    $stmt->bind_param("i", $idUsuario);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $row = $res->fetch_assoc();
+    $fotoPerfil = $row['fotoPerfil'] ?? null;
+    $stmt->close();
 }
-// If logged in, you can allow upload logic below
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        header {
-    background-color: #0F0F0F;
-    padding: 20px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: fixed; /* fixa no topo */
-    top: 0;
-    left: 50%; /* centraliza horizontalmente */
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 1200px;
-    border-radius: 15px;
-    box-shadow: 0 0 12px rgb(255, 255, 255);
-    z-index: 9999;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil - Touch Your Butt-on</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/l8NOfCE.png">
+<style>
+body {
+  background: #1A1A1D;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  padding-top: 100px;
 }
 
+/* NAVBAR */
+header {
+  background-color: #0F0F0F;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1200px;
+  border-radius: 15px;
+  box-shadow: 0 0 12px rgb(255, 255, 255);
+  z-index: 9999;
+}
 .navbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    color: #edf0f1;
-    font-weight: bold;
-    font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #edf0f1;
+  font-weight: bold;
+  font-size: 18px;
 }
-
-.navbar-brand img {
-    width: 40px;
-    height: 40px;
-}
-
+.navbar-brand img { width: 40px; height: 40px; }
 .nav_links {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin: 0;
-    padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 0; padding: 0;
 }
-
 .nav-item a {
-    text-decoration: none;
-    color: #edf0f1;
-    font-weight: 500;
-    transition: 0.3s;
+  text-decoration: none;
+  color: #edf0f1;
+  font-weight: 500;
+  transition: 0.3s;
 }
-
-.nav-item a:hover {
-    color: #0088a2;
-}
-
-/* PROFILE */
-.profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#logintext {
-    color: #fff;
-    font-weight: 500;
-    padding: 6px 12px;
-    border: 2px solid #fff;
-    border-radius: 6px;
-    transition: 0.3s;
-}
-
-#logintext:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 8px #fff;
-}
+.nav-item a:hover { color: #0088a2; }
 
 .pfp {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 0 6px rgba(0, 136, 162, 0.4);
-    cursor: pointer;
-    transition: 0.3s;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #0088a2;
+  box-shadow: 0 0 15px rgba(0,136,162,0.4);
+  margin-top: 20px;
 }
 
-.pfp:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.822);
+/* FORM */
+form {
+  margin-top: 30px;
+  background: #0F0F0F;
+  display: inline-block;
+  padding: 25px 35px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255,255,255,0.1);
 }
-
-/* HAMBURGUER - RESPONSIVO */
-.hamburguer {
-    display: none;
-    cursor: pointer;
-    position: absolute;
-    top: 25px;
-    right: 40px;
-    z-index: 1000;
+input[type="file"] {
+  display: block;
+  margin: 10px auto 20px;
+  color: #fff;
 }
-
-.bar {
-    display: block;
-    width: 25px;
-    height: 3px;
-    margin: 5px;
-    background-color: #edf0f1;
-    transition: 0.3s;
+button {
+  background: #0088a2;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
 }
+button:hover { background: #006b83; }
 
 @media (max-width: 768px) {
-    .hamburguer { display: block; }
-
-    .hamburguer.active .bar:nth-child(2) { opacity: 0; }
-    .hamburguer.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-    .hamburguer.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-
-    .nav_links {
-        position: fixed;
-        left: -100%;
-        top: 70px;
-        flex-direction: column;
-        background-color: #0F0F0F;
-        width: 100%;
-        text-align: center;
-        transition: 0.3s;
-        padding: 20px 0;
-    }
-
-    .nav_links.active { left: 0; }
-    .nav-item { margin: 16px 0; }
+  .pfp { width: 80px; height: 80px; }
+  form { width: 90%; }
 }
-    </style>
+</style>
 </head>
 <body>
-    
-</body>
-=======
-<?php
-session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    // Not logged in → redirect to login page
-    header('Location: login.php');
-    exit;
-}
-// If logged in, you can allow upload logic below
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        header {
-    background-color: #0F0F0F;
-    padding: 20px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: fixed; /* fixa no topo */
-    top: 0;
-    left: 50%; /* centraliza horizontalmente */
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 1200px;
-    border-radius: 15px;
-    box-shadow: 0 0 12px rgb(255, 255, 255);
-    z-index: 9999;
-}
 
-.navbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    color: #edf0f1;
-    font-weight: bold;
-    font-size: 18px;
-}
+<header>
+  <a class="navbar-brand" href="index.php">
+    <img src="https://i.imgur.com/l8NOfCE.png" alt="Logo">
+    Touch Your Butt-on
+  </a>
+  <nav>
+    <ul class="nav_links">
+      <li class="nav-item"><a href="index.php">Home</a></li>
+      <li class="nav-item"><a href="about.html">About</a></li>
+      <li class="nav-item"><a href="https://api.whatsapp.com/send/?phone=92155305">Contact</a></li>
+    </ul>
+  </nav>
+</header>
 
-.navbar-brand img {
-    width: 40px;
-    height: 40px;
-}
+<?php if ($logado): ?>
+  <h1>Olá, <?= htmlspecialchars($usuario) ?>!</h1>
+  <img class="pfp" src="<?= htmlspecialchars(!empty($fotoPerfil) ? 'uploads/' . $fotoPerfil : 'https://i.imgur.com/ipPga81.png') ?>" alt="Foto de Perfil">
+  
+  <form id="uploadForm" enctype="multipart/form-data" method="POST" action="upload.php">
+    <h3>Alterar Foto de Perfil ou Enviar Som</h3>
+    <input type="file" name="fotoPerfil" accept="image/*">
+    <input type="file" name="audio" accept="audio/*">
+    <button type="submit">Enviar</button>
+  </form>
 
-.nav_links {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin: 0;
-    padding: 0;
-}
+<?php else: ?>
+  <h2>Você não está logado!</h2>
+  <p>Redirecionando para o login...</p>
+  <script>
+    setTimeout(() => window.location.href = "login.php", 1500);
+  </script>
+<?php endif; ?>
 
-.nav-item a {
-    text-decoration: none;
-    color: #edf0f1;
-    font-weight: 500;
-    transition: 0.3s;
-}
+<script>
+// AUTO LOGIN VIA localStorage + AJAX
+document.addEventListener("DOMContentLoaded", async () => {
+  const usuarioLocal = localStorage.getItem("usuarioLogado");
+  const phpLogado = <?= json_encode($logado) ?>;
+  console.log("Profile autologin → Local:", usuarioLocal, "| PHP logado:", phpLogado);
 
-.nav-item a:hover {
-    color: #0088a2;
-}
+  if (phpLogado) return;
+  if (!usuarioLocal) {
+    window.location.href = "login.php";
+    return;
+  }
 
-/* PROFILE */
-.profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#logintext {
-    color: #fff;
-    font-weight: 500;
-    padding: 6px 12px;
-    border: 2px solid #fff;
-    border-radius: 6px;
-    transition: 0.3s;
-}
-
-#logintext:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 8px #fff;
-}
-
-.pfp {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 0 6px rgba(0, 136, 162, 0.4);
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.pfp:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.822);
-}
-
-/* HAMBURGUER - RESPONSIVO */
-.hamburguer {
-    display: none;
-    cursor: pointer;
-    position: absolute;
-    top: 25px;
-    right: 40px;
-    z-index: 1000;
-}
-
-.bar {
-    display: block;
-    width: 25px;
-    height: 3px;
-    margin: 5px;
-    background-color: #edf0f1;
-    transition: 0.3s;
-}
-
-@media (max-width: 768px) {
-    .hamburguer { display: block; }
-
-    .hamburguer.active .bar:nth-child(2) { opacity: 0; }
-    .hamburguer.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-    .hamburguer.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-
-    .nav_links {
-        position: fixed;
-        left: -100%;
-        top: 70px;
-        flex-direction: column;
-        background-color: #0F0F0F;
-        width: 100%;
-        text-align: center;
-        transition: 0.3s;
-        padding: 20px 0;
+  try {
+    const res = await fetch("auto_login.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usuario: usuarioLocal }),
+      credentials: "same-origin"
+    });
+    const data = await res.json();
+    console.log("profile auto_login.php =>", data);
+    if (data.sucesso) {
+      setTimeout(() => location.reload(), 300);
+    } else {
+      window.location.href = "login.php";
     }
+  } catch (err) {
+    console.error("Erro no autoLogin:", err);
+    window.location.href = "login.php";
+  }
+});
+</script>
 
-    .nav_links.active { left: 0; }
-    .nav-item { margin: 16px 0; }
-}
-    </style>
-</head>
-<body>
-    
 </body>
-
 </html>
