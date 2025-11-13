@@ -2,7 +2,7 @@
 session_start();
 
 // Conexão com banco MySQL (ajuste conforme seu ambiente)
-$pdo = new PDO("mysql:host=127.0.0.1;dbname=touchyourbutton;charset=utf8mb4", "root", "", [
+$pdo = new PDO("mysql:host=127.0.0.1:3308;dbname=touchyourbutton;charset=utf8mb4", "root", "", [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 ]);
 
@@ -59,3 +59,5 @@ echo json_encode([
     'idUsuario' => $user['id']
 ]);
 exit;
+
+?>

@@ -45,10 +45,11 @@ $conn->close();
   <title>Touch Your Butt-on</title>
   <style>
     /* --- Reset / Base --- */
-    *, *::before, *::after {
+    *, *::before, *::after, * a {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      text-decoration: none;
     }
     body {
       font-family: "Poppins", sans-serif;
@@ -310,6 +311,7 @@ $conn->close();
     <audio id="sound28" src="audio/spiderman-meme-song.mp3"></audio>
     <audio id="sound29" src="audio/a-few-moments-later-hd.mp3"></audio>
     <audio id="sound30" src="audio/outro-song_oqu8zAg.mp3"></audio>
+    
 </div>
 
 <script>

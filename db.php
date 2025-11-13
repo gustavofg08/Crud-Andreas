@@ -1,14 +1,16 @@
 <?php
-$servername = "localhost";
-$username = "root";  // padrão do XAMPP
-$password = "";      // padrão do XAMPP (sem senha)
-$dbname = "touchyourbutton"; // nome do banco de dados (ajuste se for outro)
+$host  = "127.0.0.1";
+$user  = "root";
+$pass  = "";
+$db    = "touchyourbutton";
+$porta = 3308; // use 3308 se for sua porta atual — ou troque pra 3306 no outro PC
 
-// Criar conexão
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($host, $user, $pass, $db, $porta);
 
-// Checar conexão
 if ($conn->connect_error) {
-    die("Falha na conexão com o banco de dados: " . $conn->connect_error);
+    die("Erro na conexão com o banco: " . $conn->connect_error);
 }
+
+// Opcional, mas ajuda em alguns casos
+$conn->set_charset("utf8mb4");
 ?>
