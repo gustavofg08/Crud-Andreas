@@ -33,8 +33,6 @@ if ($logado && $usuario && $idUsuario) {
 } else {
     error_log("DEBUG index.php — no fotoPerfil fetch attempted (logado && usuario && idUsuario failed)");
 }
-
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -311,7 +309,23 @@ $conn->close();
     <audio id="sound28" src="audio/spiderman-meme-song.mp3"></audio>
     <audio id="sound29" src="audio/a-few-moments-later-hd.mp3"></audio>
     <audio id="sound30" src="audio/outro-song_oqu8zAg.mp3"></audio>
-    
+    <?php
+// Só tenta se $logado estiver setado no index.php e $idUsuario definido
+if (isset($logado) && $logado && isset($idUsuario) && $idUsuario) {
+    $stmt = $conn->prepare("SELECT audio FROM uploads WHERE idUsuario = ? AND audio IS NOT NULL ORDER BY dataUpload DESC");
+    $stmt->bind_param("i", $idUsuario);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    while ($row = $res->fetch_assoc()) {
+        $arquivo = $row['audio'];
+        $nome = pathinfo($arquivo, PATHINFO_FILENAME);
+        $nomeEx = mb_strlen($nome,'UTF-8') > 20 ? mb_substr($nome,0,20,'UTF-8').'...' : $nome;
+        echo "<button class='botao' onclick=\"playSoundFromUploads('uploads/".htmlspecialchars($arquivo,ENT_QUOTES)."')\">".htmlspecialchars($nomeEx)."</button>";
+    }
+    $stmt->close();
+}
+?>
+
 </div>
 
 <script>
@@ -409,5 +423,88 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+<script>
+// função usada só para sons gerados dinamicamente (uploads)
+function playSoundFromUploads(url) {
+  try {
+    // tenta pausar todos os <audio> existentes com data-generated
+    document.querySelectorAll('audio[data-generated]').forEach(a => { try{ a.pause(); } catch(e){} });
+    const a = new Audio(url);
+    a.setAttribute('data-generated','1');
+    a.play().catch(err => console.error('play error', err));
+  } catch(e){ console.error(e); alert('Erro ao reproduzir som'); }
+}
+</script>
+<script>
+// tenta auto-login só UMA vez por sessão do browser
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const usuarioLocal = localStorage.getItem('usuarioLogado');
+    const phpLogado = <?= json_encode($logado ?? false) ?>; // já no PHP
+
+    console.log('AutoLogin check → local:', usuarioLocal, 'phpLogado:', phpLogado);
+
+    if (!usuarioLocal || phpLogado) return;
+    if (sessionStorage.getItem('autoLoginFeito')) return;
+
+    const res = await fetch('auto_login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuario: usuarioLocal }),
+      credentials: 'same-origin'   // **CRUCIAL** para enviar/receber cookie de sessão
+    });
+
+    const data = await res.json();
+    console.log('auto_login resposta:', data);
+
+    if (data.sucesso) {
+      sessionStorage.setItem('autoLoginFeito', 'true');
+      // esperar um pouco para o cookie do servidor existir no browser
+      setTimeout(() => location.reload(), 250);
+    } else {
+      console.warn('auto_login falhou:', data.mensagem);
+    }
+  } catch (err) {
+    console.error('Erro no autoLogin:', err);
+  }
+});
+
+// clique no avatar (id="pfpButton")
+document.addEventListener('DOMContentLoaded', () => {
+  const pfp = document.getElementById('pfpButton');
+  if (!pfp) return;
+
+  pfp.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const usuarioLocal = localStorage.getItem('usuarioLogado');
+    if (!usuarioLocal) {
+      return window.location.href = 'login.php';
+    }
+
+    try {
+      const res = await fetch('auto_login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario: usuarioLocal }),
+        credentials: 'same-origin'
+      });
+      const data = await res.json();
+      console.log('pfp click -> auto_login:', data);
+
+      if (data.sucesso) {
+        // pequena espera para garantir cookie/sessão
+        setTimeout(() => { window.location.href = 'profile.php'; }, 200);
+      } else {
+        window.location.href = 'login.php';
+      }
+    } catch (err) {
+      console.error('Erro no pfp auto-login:', err);
+      window.location.href = 'login.php';
+    }
+  });
+});
+</script>
+
 </body>
 </html>
