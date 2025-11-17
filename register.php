@@ -1,53 +1,73 @@
 <?php
 session_start();
+require_once 'db.php';
 
-?>
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-header('Content-Type: text/html; charset=utf-8');
+// If user is already logged in, redirect to index
+if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
+    header('Location: index.php');
+    exit;
+}
+
+$erro = '';
+$sucesso = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    header('Content-Type: application/json');
+    $nome = trim($_POST['nome'] ?? '');
+    $senha = $_POST['senha'] ?? '';
+    $confirmar_senha = $_POST['confirmar_senha'] ?? '';
 
-    $conn = new mysqli('localhost', 'root', '', 'touchyourbutton');
-
-    if ($conn->connect_error) {
-        echo json_encode(['sucesso' => false, 'mensagem' => 'Erro ao conectar com o banco']);
-        exit;
-    }
-
-    $dados = json_decode(file_get_contents('php://input'), true);
-    $usuario = $dados['usuario'] ?? '';
-    $senha = $dados['senha'] ?? '';
-
-    if (empty($usuario) || empty($senha)) {
-        echo json_encode(['sucesso' => false, 'mensagem' => 'Preencha todos os campos']);
-        exit;
-    }
-
-    $check = $conn->prepare("SELECT id FROM usuario WHERE nome = ?");
-    $check->bind_param("s", $usuario);
-    $check->execute();
-    $check->store_result();
-
-    if ($check->num_rows > 0) {
-        echo json_encode(['sucesso' => false, 'mensagem' => 'Usuário já existe']);
-        exit;
-    }
-
-    $stmt = $conn->prepare("INSERT INTO usuario (nome, senha) VALUES (?, ?)");
-    $stmt->bind_param("ss", $usuario, $senha);
-
-    if ($stmt->execute()) {
-        echo json_encode(['sucesso' => true, 'mensagem' => 'Usuário registrado com sucesso']);
+    // Validation
+    if (empty($nome) || empty($senha) || empty($confirmar_senha)) {
+        $erro = 'Todos os campos são obrigatórios.';
+    } elseif (strlen($nome) < 3) {
+        $erro = 'O nome deve ter pelo menos 3 caracteres.';
+    } elseif (strlen($senha) < 6) {
+        $erro = 'A senha deve ter pelo menos 6 caracteres.';
+    } elseif ($senha !== $confirmar_senha) {
+        $erro = 'As senhas não coincidem.';
     } else {
-        echo json_encode(['sucesso' => false, 'mensagem' => 'Erro ao registrar usuário']);
+        // Check if username already exists
+        $stmt = $conn->prepare("SELECT id FROM usuario WHERE nome = ?");
+        $stmt->bind_param("s", $nome);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $erro = 'Este nome de usuário já está em uso.';
+            $stmt->close();
+        } else {
+            $stmt->close();
+            
+            // Hash the password
+            $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+            
+            // Insert new user
+            $stmt = $conn->prepare("INSERT INTO usuario (nome, senha) VALUES (?, ?)");
+            $stmt->bind_param("ss", $nome, $senha_hash);
+            
+            if ($stmt->execute()) {
+                $newUserId = $conn->insert_id;
+                
+                // LOG: Account creation
+                logAction($newUserId, "Conta criada: " . $nome);
+                
+                // Auto-login after registration
+                $_SESSION['logado'] = true;
+                $_SESSION['usuario'] = $nome;
+                $_SESSION['idUsuario'] = $newUserId;
+                
+                $stmt->close();
+                
+                // Set success message and redirect
+                $_SESSION['sucesso_registro'] = 'Conta criada com sucesso!';
+                header('Location: index.php');
+                exit;
+            } else {
+                $erro = 'Erro ao criar conta. Tente novamente.';
+                $stmt->close();
+            }
+        }
     }
-
-    $stmt->close();
-    $conn->close();
-    exit;
 }
 ?>
 

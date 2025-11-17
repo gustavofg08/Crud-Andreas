@@ -1,43 +1,51 @@
 <?php
 session_start();
-require_once "db.php";
+require_once 'db.php';
 
-$dados = json_decode(file_get_contents("php://input"), true);
-$id = intval($dados["id"] ?? 0);
-
-if (!$id) {
-    echo json_encode(["sucesso" => false, "mensagem" => "ID inválido"]);
+if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
+    header('Content-Type: application/json');
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Não logado']);
     exit;
 }
 
-if (!isset($_SESSION["idUsuario"])) {
-    echo json_encode(["sucesso" => false, "mensagem" => "Não logado"]);
+$input = json_decode(file_get_contents('php://input'), true);
+$soundId = intval($input['id'] ?? 0);
+
+if ($soundId <= 0) {
+    echo json_encode(['sucesso' => false, 'mensagem' => 'ID inválido']);
     exit;
 }
 
-$idUser = $_SESSION["idUsuario"];
-
-// buscar arquivo
-$stmt = $conn->prepare("SELECT audio FROM uploads WHERE id = ? AND idUsuario = ? LIMIT 1");
-$stmt->bind_param("ii", $id, $idUser);
+// Get sound info before deleting for logging
+$stmt = $conn->prepare("SELECT audio FROM uploads WHERE id = ? AND idUsuario = ?");
+$stmt->bind_param("ii", $soundId, $_SESSION['idUsuario']);
 $stmt->execute();
-$res = $stmt->get_result();
-$up = $res->fetch_assoc();
-$stmt->close();
+$result = $stmt->get_result();
+$soundData = $result->fetch_assoc();
 
-if (!$up) {
-    echo json_encode(["sucesso" => false, "mensagem" => "Som não encontrado"]);
+if ($result->num_rows === 0) {
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Som não encontrado']);
     exit;
 }
 
-$file = __DIR__ . "/uploads/" . $up["audio"];
-if (file_exists($file)) unlink($file);
+// Delete the sound
+$stmt = $conn->prepare("DELETE FROM uploads WHERE id = ?");
+$stmt->bind_param("i", $soundId);
 
-$stmt = $conn->prepare("DELETE FROM uploads WHERE id = ? AND idUsuario = ?");
-$stmt->bind_param("ii", $id, $idUser);
-$stmt->execute();
+if ($stmt->execute()) {
+    // LOG: Delete action
+    logAction($_SESSION['idUsuario'], "Excluiu som: " . $soundData['audio']);
+    
+    // Also delete the actual file
+    $filePath = __DIR__ . '/uploads/' . $soundData['audio'];
+    if (file_exists($filePath)) {
+        unlink($filePath);
+    }
+    
+    echo json_encode(['sucesso' => true, 'mensagem' => 'Som excluído com sucesso']);
+} else {
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Erro ao excluir som']);
+}
+
 $stmt->close();
-
-echo json_encode(["sucesso" => true]);
-exit;
 ?>

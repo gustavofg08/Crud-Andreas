@@ -1,11 +1,16 @@
 <?php
 session_start();
+require_once 'db.php';
+
+// If user is already logged in, redirect to index
 if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
     header('Location: index.php');
     exit;
 }
-?>
 
+// Log page access attempt
+logAction(0, "Página de login acessada");
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>

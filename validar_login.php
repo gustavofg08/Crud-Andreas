@@ -1,63 +1,62 @@
 <?php
 session_start();
-
-// Conexão com banco MySQL (ajuste conforme seu ambiente)
-$pdo = new PDO("mysql:host=127.0.0.1:3308;dbname=touchyourbutton;charset=utf8mb4", "root", "", [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-]);
-
-// Lê dados enviados via fetch (JSON)
-$dados   = json_decode(file_get_contents('php://input'), true);
-$usuario = trim($dados['usuario'] ?? '');
-$senha   = trim($dados['senha']   ?? '');
+require_once 'db.php';
 
 header('Content-Type: application/json');
 
-// Verificação simples de preenchimento
-if ($usuario === '' || $senha === '') {
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Preencha todos os campos.']);
+// Get POST data
+$input = json_decode(file_get_contents('php://input'), true);
+$usuario = trim($input['usuario'] ?? '');
+$senha = $input['senha'] ?? '';
+
+// Validation
+if (empty($usuario) || empty($senha)) {
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Usuário e senha são obrigatórios.']);
     exit;
 }
 
-// Busca usuário na tabela `usuario`
-$stmt = $pdo->prepare("SELECT id, nome, senha FROM usuario WHERE nome = :nome LIMIT 1");
-$stmt->execute([':nome' => $usuario]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$user) {
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Usuário não encontrado.']);
-    exit;
+try {
+    // Check if user exists
+    $stmt = $conn->prepare("SELECT id, nome, senha FROM usuario WHERE nome = ?");
+    $stmt->bind_param("s", $usuario);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 0) {
+        // LOG: Failed login attempt (user not found)
+        logAction(0, "Tentativa de login com usuário não encontrado: " . $usuario);
+        echo json_encode(['sucesso' => false, 'mensagem' => 'Usuário ou senha incorretos.']);
+        exit;
+    }
+    
+    $user = $result->fetch_assoc();
+    $stmt->close();
+    
+    // Verify password
+    if (password_verify($senha, $user['senha'])) {
+        // Set session variables
+        $_SESSION['logado'] = true;
+        $_SESSION['usuario'] = $user['nome'];
+        $_SESSION['idUsuario'] = $user['id'];
+        
+        // LOG: Successful login
+        logAction($user['id'], "Login realizado com sucesso");
+        
+        echo json_encode([
+            'sucesso' => true, 
+            'mensagem' => 'Login realizado com sucesso!',
+            'usuario' => $user['nome'],
+            'idUsuario' => $user['id']
+        ]);
+    } else {
+        // LOG: Failed login attempt (wrong password)
+        logAction($user['id'], "Tentativa de login com senha incorreta");
+        echo json_encode(['sucesso' => false, 'mensagem' => 'Usuário ou senha incorretos.']);
+    }
+    
+} catch (Exception $e) {
+    // LOG: Login error
+    logAction(0, "Erro durante tentativa de login: " . $e->getMessage());
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Erro interno do servidor.']);
 }
-
-// Verifica senha (compatível com hashes e senhas antigas em texto)
-$senhaCorreta = false;
-if (password_verify($senha, $user['senha'])) {
-    $senhaCorreta = true;
-} elseif ($user['senha'] === $senha) {
-    $senhaCorreta = true;
-    // Atualiza a senha antiga para hash moderno
-    $novoHash = password_hash($senha, PASSWORD_DEFAULT);
-    $update  = $pdo->prepare("UPDATE usuario SET senha = ? WHERE id = ?");
-    $update->execute([$novoHash, $user['id']]);
-}
-
-if (!$senhaCorreta) {
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Senha incorreta.']);
-    exit;
-}
-
-// Login bem‑sucedido → cria sessão
-$_SESSION['logado']  = true;
-$_SESSION['usuario'] = $user['nome'];
-$_SESSION['idUsuario'] = $user['id'];
-
-// Retorna sucesso em JSON, com dados úteis para o cliente
-echo json_encode([
-    'sucesso'   => true,
-    'mensagem'  => 'Login realizado com sucesso.',
-    'usuario'   => $user['nome'],
-    'idUsuario' => $user['id']
-]);
-exit;
-
 ?>
